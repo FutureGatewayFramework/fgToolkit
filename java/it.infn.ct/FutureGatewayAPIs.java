@@ -211,15 +211,14 @@ public class FutureGatewayAPIs {
                               String mail,
                               String institute) {
         _log.debug("createUser");
-        String jsonData = "{ \"name\": \"" + name + "\"," +
-                          "  \"first_name\": \"" + firstName + "\"," +
+        String jsonData = "{  \"first_name\": \"" + firstName + "\"," +
                           "  \"last_name\": \"" + lastName + "\"," +
                           "  \"mail\": \"" + mail + "\"," +
                           "  \"institute\": \"" + institute + "\" }";
         _log.debug("jsonData: '" + jsonData + "'");
         try {
             JSONObject jsonResult = doPost(
-                "users",
+                "users/" + name,
                 JSONFactoryUtil.createJSONObject(jsonData));
         } catch(JSONException e) {
             errFlag = true;
