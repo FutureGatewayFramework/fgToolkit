@@ -4,3 +4,6 @@ The repository contain different directories each dedicated to a specific servic
 
 # Java
 This section provides tools, classes and libraries for java applications
+
+# Js
+This section contain javascript code used to interact with FG APIs.
