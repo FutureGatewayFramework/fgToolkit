@@ -7,3 +7,6 @@ This section provides tools, classes and libraries for java applications
 
 # Python
 This section provide the python code to manage FutureGateway APIs
+
+# Js
+This section contain javascript code used to interact with FG APIs.
