@@ -219,7 +219,7 @@ public class FutureGatewayAPIs {
         _log.debug("jsonData: '" + jsonData + "'");
 	try {
             JSONObject jsonResult = doPost(
-                "users",
+                "users/" + name,
                 JSONFactoryUtil.createJSONObject(jsonData));
 	} catch(JSONException e) {
             errFlag = true;
