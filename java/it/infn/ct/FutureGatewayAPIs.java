@@ -211,21 +211,21 @@ public class FutureGatewayAPIs {
                               String mail,
                               String institute) {
         _log.debug("createUser");
-        String jsonData = "{ \"name\": \"" + name + "\"," +
-                          "  \"first_name\": \"" + firstName + "\"," +
-                          "  \"last_name\": \"" + lastName + "\"," +
-                          "  \"mail\": \"" + mail + "\"," +
-                          "  \"institute\": \"" + institute + "\" }";
+	String jsonData = "{ \"name\": \"" + name + "\"," +
+		          "  \"first_name\": \"" + firstName + "\"," +
+			  "  \"last_name\": \"" + lastName + "\"," +
+			  "  \"mail\": \"" + mail + "\"," +
+			  "  \"institute\": \"" + institute + "\" }";
         _log.debug("jsonData: '" + jsonData + "'");
-        try {
+	try {
             JSONObject jsonResult = doPost(
                 "users",
                 JSONFactoryUtil.createJSONObject(jsonData));
-        } catch(JSONException e) {
+	} catch(JSONException e) {
             errFlag = true;
-            errMessage = "Unable to create json object from json data: '" + jsonData + "'";
-            _log.error(errMessage + LS + e.toString());
-        }
+	    errMessage = "Unable to create json object from json data: '" + jsonData + "'";
+	    _log.error(errMessage + LS + e.toString());
+	}
         return !this.errFlag;
     }
 
@@ -250,8 +250,8 @@ public class FutureGatewayAPIs {
                 JSONFactoryUtil.createJSONObject(jsonData));
         } catch(JSONException e) {
             errFlag = true;
-            errMessage = "Unable to add groups: '" +
-            groupList.substring(0, groupList.length()-1) +
+            errMessage = "Unable to add groups: '" + 
+		         groupList.substring(0, groupList.length()-1) + 
                          "' to user: '" + userName + "'";
             _log.error(errMessage + LS + e.toString());
         }
@@ -293,6 +293,7 @@ public class FutureGatewayAPIs {
     public JSONArray getUserGroups(String userName) {
         _log.debug("getUserGroups");
         JSONArray groups = null;
+
         JSONObject jsonResult = doGet("users/" + userName + "/groups");
         if(jsonResult != null) {
             groups = jsonResult.getJSONArray("groups");
@@ -304,20 +305,21 @@ public class FutureGatewayAPIs {
      * Return true if the specified user has the specified group
      */
     public boolean userHasGroup(String userName, String groupName) {
-      _log.debug("userHasGroup");
-      boolean hasGroup = false;
-      JSONArray groups = getUserGroups(userName);
-      if(groups != null) {
-        for (int i = 0 ; i < groups.length(); i++) {
-            JSONObject group = groups.getJSONObject(i);
-            String name = group.getString("name");
-            if(name.equals(groupName)) {
-                hasGroup = true;
-                break;
+        _log.debug("userHasGroup");
+        boolean hasGroup = false;
+
+        JSONArray groups = getUserGroups(userName);
+	if(groups != null) {
+	    for (int i = 0 ; i < groups.length(); i++) {
+                JSONObject group = groups.getJSONObject(i);
+		String name = group.getString("name");
+		if(name.equals(groupName)) {
+                    hasGroup = true;
+                    break;
+		}
             }
-        }
-      }
-      return hasGroup;
+	}
+        return hasGroup;
     }
 
     /**
@@ -328,47 +330,6 @@ public class FutureGatewayAPIs {
         this.errMessage = errorDetail;
         this.errRequest = request;
     }
-
-    /**
-     * Perform common operations while intitating a FutureGateway API request
-     *
-     */
-    private String initFGRequest(String endpoint, AuthParams authParams) {
-        String textRequest = "";
-        // Reset err variables
-        this.errFlag = false;
-        this.errMessage = "";
-        this.errRequest = textRequest = this.fgBaseUrl + "/" +
-                                        this.fgAPIVersion + "/" + endpoint;
-        if(authParams.isAuthParams()) {
-            if(textRequest.indexOf("?") > 0) {
-                textRequest += "&" + authParams.getAuthParams();
-            } else {
-                textRequest += "?" + authParams.getAuthParams();
-            }
-        }
-        _log.debug("Request: '" + textRequest + "'");
-        return textRequest;
-    }
-
-    /**
-     * Handle eventual redirects, returning a new URL object in case a
-     * redirection occurs or return null otherwise.
-     *
-     */
-    private URL handleRedirects(HttpURLConnection conn) throws IOException {
-       int status = conn.getResponseCode();
-       if (status != HttpURLConnection.HTTP_OK) {
-           if (status == HttpURLConnection.HTTP_MOVED_TEMP ||
-               status == HttpURLConnection.HTTP_MOVED_PERM ||
-               status == HttpURLConnection.HTTP_SEE_OTHER) {
-               String newUrl = conn.getHeaderField("Location");
-               _log.debug("Got redirection to: '" + newUrl + "'");
-          return new URL(newUrl);
-           }
-       }
-       return null;
-    }
     
     /**
      * Perform a GET request to a given endpoint to the futuregateway
@@ -376,25 +337,35 @@ public class FutureGatewayAPIs {
      */
     public JSONObject doGet(String endpoint) {
         String jsonResult = "";
+        String fgTextRequest = "";
+        URL fgRequest = null;
         AuthParams authParams = new AuthParams(this.currentAuth, this);
-        String fgTextRequest = initFGRequest(endpoint, authParams);
-        _log.debug("GET (begin)");
+
+	_log.debug("GET");
         // Prepare and execute the GET request
-        try {            
-            URL fgRequest = new URL(fgTextRequest);
-            HttpURLConnection urlConnection =
-                (HttpURLConnection)fgRequest.openConnection();
-            URL redirectUrl = handleRedirects(urlConnection);
-            if(redirectUrl != null) {
-                urlConnection = (HttpURLConnection)redirectUrl.openConnection();
+        try {
+            // Reset err variables
+            this.errFlag = false;
+            this.errMessage = "";
+            this.errRequest = fgTextRequest = fgBaseUrl + "/" +
+                                              fgAPIVersion + "/" + endpoint;
+            if(authParams.isAuthParams()) {
+                if(fgTextRequest.indexOf("?") > 0) {
+                    fgTextRequest += "&" + authParams.getAuthParams();
+                } else {
+                    fgTextRequest += "?" + authParams.getAuthParams();
+                }
             }
+            _log.debug("Request: '" + fgTextRequest + "'");
+            fgRequest = new URL(fgTextRequest);
+            HttpURLConnection urlConnection = (HttpURLConnection)fgRequest.openConnection();
             if(authParams.isAuthHeader()) {
                 urlConnection.setRequestProperty("Authorization",
                                                  authParams.getAuthHeader());
                 _log.debug("Authorization: " + authParams.getAuthHeader());
             }
             urlConnection.setUseCaches(false);
-            urlConnection.setRequestMethod("GET");
+	    urlConnection.setRequestMethod("GET");
             // Get response
             BufferedReader buffread = 
                 new BufferedReader(
@@ -408,8 +379,7 @@ public class FutureGatewayAPIs {
             setError(fgTextRequest, e.toString());
         } catch(IOException e) {
             setError(fgTextRequest, e.toString());
-        }
-        _log.debug("Result: " + jsonResult);	
+        } 
         // Create JSON object form result
         JSONObject jsonObj = null;
         try {
@@ -428,18 +398,28 @@ public class FutureGatewayAPIs {
     public JSONObject doPost(String endpoint,
                              JSONObject jsonData) {
         String jsonResult = "";
+        String fgTextRequest = "";
+        URL fgRequest = null;
         AuthParams authParams = new AuthParams(this.currentAuth, this);
-        String fgTextRequest = initFGRequest(endpoint, authParams);
-        _log.debug("POST");
+
+	_log.debug("POST");
         // Prepare and execute the POST request
         try {
-            URL fgRequest = new URL(fgTextRequest);
-            HttpURLConnection urlConnection =
-                (HttpURLConnection)fgRequest.openConnection();
-            URL redirectUrl = handleRedirects(urlConnection);
-            if(redirectUrl != null) {
-                urlConnection = (HttpURLConnection)redirectUrl.openConnection();
+            // Reset err variables
+            this.errFlag = false;
+            this.errMessage = "";
+            this.errRequest = fgTextRequest = fgBaseUrl + "/" +
+                                              fgAPIVersion + "/" + endpoint;
+            if(authParams.isAuthParams()) {
+                if(fgTextRequest.indexOf("?") > 0) {
+                    fgTextRequest += "&" + authParams.getAuthParams();
+                } else {
+                    fgTextRequest += "?" + authParams.getAuthParams();
+                }
             }
+            _log.debug("Request: '" + fgTextRequest + "'");
+            fgRequest = new URL(fgTextRequest);
+            HttpURLConnection urlConnection = (HttpURLConnection)fgRequest.openConnection();
             if(authParams.isAuthHeader()) {
                 urlConnection.setRequestProperty("Authorization",
                                                  authParams.getAuthHeader());
@@ -486,20 +466,29 @@ public class FutureGatewayAPIs {
      */
     public JSONObject doDelete(String endpoint,
                                JSONObject jsonData) {
+        String jsonResult = "";
+        String fgTextRequest = "";
+        URL fgRequest = null;
         AuthParams authParams = new AuthParams(this.currentAuth, this);
-        String fgTextRequest = initFGRequest(endpoint, authParams);
-        _log.debug("DELETE");
+
+	_log.debug("DELETE");
         // Prepare and execute the POST request
         try {
-            String fgTextRequest = initFGRequest(endpoint, authParams);
-            _log.debug("Request: '" + fgTextRequest + "'");
-            URL fgRequest = new URL(fgTextRequest);
-            HttpURLConnection urlConnection =
-                (HttpURLConnection)fgRequest.openConnection();
-            URL redirectUrl = handleRedirects(urlConnection);
-            if(redirectUrl != null) {
-                urlConnection = (HttpURLConnection)redirectUrl.openConnection();
+            // Reset err variables
+            this.errFlag = false;
+            this.errMessage = "";
+            this.errRequest = fgTextRequest = fgBaseUrl + "/" +
+                                              fgAPIVersion + "/" + endpoint;
+            if(authParams.isAuthParams()) {
+                if(fgTextRequest.indexOf("?") > 0) {
+                    fgTextRequest += "&" + authParams.getAuthParams();
+                } else {
+                    fgTextRequest += "?" + authParams.getAuthParams();
+                }
             }
+            _log.debug("Request: '" + fgTextRequest + "'");
+            fgRequest = new URL(fgTextRequest);
+            HttpURLConnection urlConnection = (HttpURLConnection)fgRequest.openConnection();
             if(authParams.isAuthHeader()) {
                 urlConnection.setRequestProperty("Authorization",
                                                  authParams.getAuthHeader());
@@ -540,3 +529,4 @@ public class FutureGatewayAPIs {
         return jsonObj;
     }
 };
+
