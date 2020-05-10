@@ -92,7 +92,7 @@ function doRequest(method,
         str_data = null;
     }
     $.ajax({
-        type: "GET",
+        type: method,
         url: url,
         dataType: "json",
         headers: {
