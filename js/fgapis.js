@@ -17,7 +17,7 @@
 /*
  * Perform a GET request to the given FG endpoint
  */
-export function doGet(url,
+function doGet(url,
                access_token,
                successFunction,
                failureFunction) {
@@ -32,7 +32,7 @@ export function doGet(url,
 /*
  * Perform a POST request to the given FG endpoint
  */
-export function doPost(url,
+function doPost(url,
                 access_token,
                 req_data,
                 successFunction,
@@ -48,7 +48,7 @@ export function doPost(url,
 /*
  * Perform a PATCH request to the given FG endpoint
  */
-export function doPatch(url,
+function doPatch(url,
                  access_token,
                  reqData,
                  successFunction,
@@ -64,7 +64,7 @@ export function doPatch(url,
 /*
  * Perform a DELETE request to the given FG endpoint
  */
-export function doDelete(url,
+function doDelete(url,
                   access_token,
                   successFunction,
                   failureFunction) {

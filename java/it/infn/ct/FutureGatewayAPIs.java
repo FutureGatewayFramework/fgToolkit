@@ -237,7 +237,7 @@ public class FutureGatewayAPIs {
         String jsonData = "{ \"groups\": [";
         String groupList = "";
         for(int i=0; i<userGroups.length; i++) {
-            groupList += "\"" + userGroups[i] + "\", ";
+            groupList += userGroups[i] + ", ";
         }
         if(groupList.length() > 0) {
            groupList = groupList.substring(0, groupList.length() - 2);
